@@ -70,14 +70,16 @@ func (o *Originator) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	originatorFields := strings.SplitN(originatorStr, ": ", 2)
-
-	if len(originatorFields) != 2 {
+	// Originator string may not have space after ":"
+	if strings.HasPrefix(originatorStr, "Person:") {
+		o.OriginatorType = "Person"
+		o.Originator = strings.TrimSpace(strings.TrimPrefix(originatorStr, "Person:"))
+	} else if strings.HasPrefix(originatorStr, "Organization:") {
+		o.OriginatorType = "Organization"
+		o.Originator = strings.TrimSpace(strings.TrimPrefix(originatorStr, "Organization:"))
+	} else {
 		return fmt.Errorf("failed to parse Originator '%s'", originatorStr)
 	}
-
-	o.OriginatorType = originatorFields[0]
-	o.Originator = originatorFields[1]
 
 	return nil
 }
